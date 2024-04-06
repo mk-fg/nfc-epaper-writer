@@ -2,7 +2,10 @@ package com.joshuatz.nfceinkwriter
 
 const val PackageName = "com.joshuatz.nfceinkwriter"
 
-const val WaveShareUID = "WSDZ10m"
+val WaveShareUIDs = arrayOf(
+    "WSDZ10m",
+    "FSTN10m" // added for 1.54" B model
+)
 
 // Order matches WS SDK Enum (except off by 1, due to zero-index)
 // @see https://www.waveshare.com/wiki/Android_SDK_for_NFC-Powered_e-Paper
@@ -15,6 +18,8 @@ val ScreenSizes = arrayOf(
     "7.5\" HD",
     "2.7\"",
     "2.9\" v.B",
+    "1.54\" v.B",
+    "4.2\" v.B",
 )
 
 val DefaultScreenSize = ScreenSizes[1]
@@ -29,6 +34,8 @@ val ScreenSizesInPixels = mapOf(
     "7.5\" HD" to Pair(880, 528),
     "2.7\"" to Pair(264, 176),
     "2.9\" v.B" to Pair(296, 128),
+    "1.54\" v.B" to Pair(200, 200),
+    "4.2\" v.B" to Pair(400, 300),
 )
 
 object Constants {

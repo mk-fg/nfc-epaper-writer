@@ -191,9 +191,9 @@ class NfcFlasher : AppCompatActivity() {
                 return
             }
 
-            // Do an explicit check for the ID. This ID *appears* to be constant across all models
-            if (tagId != WaveShareUID) {
-                Log.v("Invalid tag ID", "$tagId != $WaveShareUID")
+            // Do an explicit check for the ID. You may need to add the correct ID for your tag model.
+            if (tagId !in WaveShareUIDs) {
+                Log.v("Invalid tag ID", "$tagId not in " + WaveShareUIDs.joinToString(", "))
                 // Currently, this ID is sometimes coming back corrupted, so it is a unreliable check
                 // only enforce check if type != ndef, because in those cases we can't check AAR
                 if (intent.action != NfcAdapter.ACTION_NDEF_DISCOVERED) {
