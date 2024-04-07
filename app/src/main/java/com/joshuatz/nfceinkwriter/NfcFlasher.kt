@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.PatternMatcher
+import android.os.SystemClock
 import android.util.Log
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -25,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import waveshare.feng.nfctag.activity.WaveShareHandler
+import waveshare.feng.nfctag.activity.a
 import java.io.IOException
 import java.nio.charset.StandardCharsets
 
@@ -239,63 +241,75 @@ class NfcFlasher : AppCompatActivity() {
 
     private suspend fun flashBitmap(tag: Tag, bitmap: Bitmap, screenSizeEnum: Int) {
         this.mIsFlashing = true
-        val waveShareHandler = WaveShareHandler(this)
-        // Setup loop to pass progress to UI
-        // Handler + callback should run on main UI thread, since it needs to access View
-        val progressCheckHandler = Handler(Looper.getMainLooper())
-        val progressCheckCallback: Runnable = object: Runnable {
+        // val waveShareHandler = WaveShareHandler(this)
+        val a = a() // Create a new instance.
+        val nfcObj = NfcA.get(tag)
+        a.a(nfcObj) // Init
+        var errorString = ""
+
+        val t: Thread = object : Thread() {
+            //Create an new thread
             override fun run() {
-                if (mIsFlashing) {
-                    updateProgressBar(waveShareHandler.progress)
-                    progressCheckHandler.postDelayed(this, mProgressCheckInterval)
-                }
-            }
-        }
-        // Notice how we are not using progressCheckCallback.run()
-        // This is because this function is right now being called inside a sep thread from UI
-        // so running outside of main will cause exception when trying to update progress bar / UI
-        progressCheckHandler.post(progressCheckCallback)
-        withContext(Dispatchers.IO) {
-            val nfcaObj = NfcA.get(tag)
-            try {
-                // @TODO - this needs to be done in non-UI thread
-                val result = waveShareHandler.sendBitmap(nfcaObj, screenSizeEnum, bitmap)
-
-                // Need to run toast on main thread...
-                runOnUiThread(Runnable {
-                    var toast: Toast? = null
-                    if (!result.success) {
-                        toast = Toast.makeText(
-                            applicationContext,
-                            "FAILED to Flash :( ${result.errMessage}",
-                            Toast.LENGTH_LONG
-                        )
-                    } else {
-                        toast = Toast.makeText(
-                            applicationContext,
-                            "Success! Flashed display!",
-                            Toast.LENGTH_LONG
-                        )
+                var success = false
+                val tntag: NfcA //NFC tag
+                val thread = Thread(Runnable
+                //Create thread
+                {
+                    var EPD_total_progress = 0
+                    while (EPD_total_progress != -1) {
+                        EPD_total_progress = a.c //Read the progress
+                        runOnUiThread(Runnable {
+                            updateProgressBar(EPD_total_progress)
+                        })
+                        if (EPD_total_progress == 100) {
+                            break
+                        }
+                        SystemClock.sleep(10)
                     }
-                    toast?.show()
                 })
-                Log.v("Final success val", "Success = ${result.success.toString()}")
-            } finally {
+                thread.start() //start the thread
+                tntag = NfcA.get(tag) //Get the tag instance.
                 try {
-                    nfcaObj.close()
+                    val whether_succeed: Int = a.a(screenSizeEnum, bitmap) //Send picture
+                    if (whether_succeed == 1) {
+                        success = true
+                    }
                 } catch (e: IOException) {
-                    e.printStackTrace()
-                    Log.v("Flashing failed", "See trace above")
+                    errorString = e.toString()
+                } finally {
+                        try {
+                            // Need to run toast on main thread...
+                            runOnUiThread(Runnable {
+                                var toast: Toast? = null
+                                if (!success) {
+                                    toast = Toast.makeText(
+                                        applicationContext,
+                                        "FAILED to Flash :( $errorString",
+                                        Toast.LENGTH_LONG
+                                    )
+                                } else {
+                                    toast = Toast.makeText(
+                                        applicationContext,
+                                        "Success! Flashed display!",
+                                        Toast.LENGTH_LONG
+                                    )
+                                }
+                                toast?.show()
+                            })
+                            Log.v("Final success val", "Success = $success")
+                            tntag.close()
+                        } catch (e: IOException) { //handle exception error
+                            e.printStackTrace()
+                            Log.v("Flashing failed", "See trace above")
+                        }
+                        Log.v("Tag closed", "Setting flash in progress = false")
+                        runOnUiThread(Runnable {
+                            mIsFlashing = false
+                        })
                 }
-                Log.v("Tag closed", "Setting flash in progress = false")
-                // Needs to run on UI thread - has setter method that does stuff
-                runOnUiThread(Runnable {
-                    mIsFlashing = false
-                })
-                progressCheckHandler.removeCallbacks(progressCheckCallback)
             }
         }
-
+        t.start() //Start thread
     }
 
     private fun enableForegroundDispatch() {
