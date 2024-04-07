@@ -245,6 +245,8 @@ class NfcFlasher : AppCompatActivity() {
         val a = a() // Create a new instance.
         val nfcObj = NfcA.get(tag)
         a.a(nfcObj) // Init
+        // Override WaveShare's SDK default of 700
+        nfcObj.timeout = 1200
         var errorString = ""
 
         val t: Thread = object : Thread() {
