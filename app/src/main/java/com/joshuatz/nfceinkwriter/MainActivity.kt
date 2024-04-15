@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     private var mPreferencesController: Preferences? = null
     private var mHasReFlashableImage: Boolean = false
     private val mReFlashButton: CardView get() = findViewById(R.id.reflashButton)
+    private var mSharedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,11 +83,32 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, TextEditor::class.java)
             startActivity(intent)
         }
+
+        // Set image uri if launched from another app
+        mSharedImageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // Set image uri if launched from another app
+        mSharedImageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
     }
 
     override fun onResume() {
         super.onResume()
         checkReFlashAbility()
+
+        if (mSharedImageUri == null) return
+
+        val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
+        val uri = mSharedImageUri
+        mSharedImageUri = null
+        CropImage
+            .activity(uri)
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setAspectRatio(screenSizePixels.first, screenSizePixels.second)
+            .setRequestedSize(screenSizePixels.first, screenSizePixels.second, CropImageView.RequestSizeOptions.RESIZE_EXACT)
+            .start(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
