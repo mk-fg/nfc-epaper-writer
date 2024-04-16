@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
 }
 
 android {
@@ -31,6 +30,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 allprojects {
@@ -50,7 +52,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'com.github.canhub:android-image-cropper:3.1.0'
-    implementation 'com.github.jeffreyliu8.Native-Floyd-Steinberg-Dithering:release:1.1.5'
+//    implementation 'com.github.jeffreyliu8.Native-Floyd-Steinberg-Dithering:release:1.1.5'
+    implementation 'com.github.devpika.Native-Floyd-Steinberg-Dithering:release:1.2.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
