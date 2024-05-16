@@ -1,5 +1,9 @@
 # NFC EInk Writer
-> An Android app to generate images for, and flash to, WaveShare Passive NFC Powered (aka *parasitic*) EInk displays, like [this one](https://www.waveshare.com/2.9inch-nfc-powered-e-paper.htm):
+> An Android app to generate images for, and flash to, WaveShare Passive NFC Powered (aka *parasitic*) EInk displays, like [this one](https://www.waveshare.com/2.9inch-nfc-powered-e-paper.htm).
+
+> This fork adds color dithering, makes the app more stable (less ANRs) and supports additional models.
+
+![WaveShare 1.54" Passive NFC-Powered EInk Display, showing an image of car from Initial D anime](https://github.com/DevPika/nfc-epaper-writer-update/assets/19701790/4fab5732-7b0c-4a90-b7ff-1b47d66bbc96)
 
 ![WaveShare 2.9" Passive NFC-Powered EInk Display, showing the text "Hello World" with a waving hand emoji at the end](https://user-images.githubusercontent.com/17817563/118736344-32156480-b7f7-11eb-9a03-7d5b7c878c30.jpg)
 
