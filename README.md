@@ -1,26 +1,65 @@
 # NFC EInk Writer
-> An Android app to generate images for, and flash to, WaveShare Passive NFC Powered (aka *parasitic*) EInk displays, like [this one](https://www.waveshare.com/2.9inch-nfc-powered-e-paper.htm).
 
-> This fork adds color dithering, makes the app more stable (less ANRs) and supports additional models.
+An Android app to generate images for, and flash to, WaveShare Passive NFC Powered (aka *parasitic*) EInk displays, like [this one](https://www.waveshare.com/2.9inch-nfc-powered-e-paper.htm).
 
 ![WaveShare 1.54" Passive NFC-Powered EInk Display, showing an image of car from Initial D anime](https://github.com/DevPika/nfc-epaper-writer-update/assets/19701790/4fab5732-7b0c-4a90-b7ff-1b47d66bbc96)
 
 ![WaveShare 2.9" Passive NFC-Powered EInk Display, showing the text "Hello World" with a waving hand emoji at the end](https://user-images.githubusercontent.com/17817563/118736344-32156480-b7f7-11eb-9a03-7d5b7c878c30.jpg)
 
+
 ## Features
+
 With this app you can flash images, custom text, or even free-form graphics to a WaveShare NFC EInk device:
 
 - ***Text***: Use the built-in generator tool to create a bitmap from any text you want. Even supports Emoji
 - ***Images***: Select a picture saved on your phone to crop and flash, or capture a new one with your camera.
-- ***Graphics***: Draw something on your phone and have it ready to flash in seconds. Uses [JSPaint](https://jspaint.app/) as the WYSIWYG editor.
+- ***Graphics***: Draw something on your phone and have it ready to flash in seconds. Uses [JSPaint] as the WYSIWYG editor.
 
-> This app should support all screen sizes supported by [the WaveShare SDK](https://www.waveshare.com/wiki/Android_SDK_for_NFC-Powered_e-Paper), but has only been tested with the 2.9" so far. The app will remember the last used size on startup.
+This app should support all screen sizes supported by [WaveShare SDK].\
+App should remember last used size on startup.
+
+[JSPaint]: https://jspaint.app/
+[WaveShare SDK]: https://www.waveshare.com/wiki/Android_SDK_for_NFC-Powered_e-Paper
+
+
+## How to build and install this to an Android device
+
+This requires any system with modern docker (aka [Docker Engine]) installed, and any terminal console app available to run its command-line tools from.
+
+-   `git clone ...` or otherwise download/unpack repository contents to a directory, and run subsequent steps in there.
+
+    For example, on a typical linux system with command-line git tool available:
+
+    ``` console
+    % git clone --depth=1 https://github.com/mk-fg/nfc-epaper-writer/
+    % cd nfc-epaper-writer
+    ```
+
+-   Build and copy Android application package (APK) to the current directory:
+
+    ``` console
+    % docker build --output type=local,dest=. .
+    ```
+
+    This will use [Dockerfile] as a recipe to build `app-debug.apk` file and copy it to the current directory (next to that Dockerfile).
+
+-   Copy generated `app-debug.apk` file to an Android device, and open it there (e.g. find and tap on it in Files app).
+
+-   Follow Android OS instruction popups from there on how to enable necessary settings to be able to install this tool from a sideloaded APK file.
+
+    This type of app installation from an APK file is called "sideloading", and steps required to allow it change between Android versions, but should be easy to lookup for specific one on the internet.
+
+-   Installed tool should show up among the usual "application drawer" icons with "NFC E-Ink Writer" name and a basic "android robot head" icon.
+
+[Docker Engine]: https://docs.docker.com/engine/install/
+[Dockerfile]: Dockerfile
+
 
 ## Demos
+
 Flashing a local image file:
 
 ![Animated GIF showing this application letting a user select a local image file from their gallery, cropping it, and then flashing it to the EInk NFC display](https://user-images.githubusercontent.com/17817563/118732297-e2329f80-b7ee-11eb-9f5c-16b2872d6bf6.gif)
-
 
 Flashing Text:
 
@@ -30,7 +69,9 @@ Creating and flashing with a WYSIWYG editor:
 
 ![Animated GIF showing user creating a custom image via WYSIWYG paint editor, having the image captured to bitmap, and then flashing the generated bitmap to the EInk NFC Display](https://user-images.githubusercontent.com/17817563/118734322-ff696d00-b7f2-11eb-947d-dc844c259518.gif)
 
+
 ## Known Issues
+
 NFC can be a little finnicky, and especially with these EInk displays. Depending on the power and capabilities of your phone, it may take time perfecting the exact distance and position to hold your phone in proximity to the EInk display in order to get successful flashes.
 
 On certain Android phones, you might also see a high rate of your NFC radio / chipset randomly *"dying"*. This happens at a lower level of system APIs, so it is really hard for my application to detect or attempt to recover from.
@@ -41,35 +82,38 @@ Additionally, sometimes you might see corrupted writes, where something goes wro
 
 ![Animated GIF showing a failed flash, with random noise appearing over the previously flashed image](https://user-images.githubusercontent.com/17817563/118723223-fde37900-b7e1-11eb-8b0c-c12ba4387d27.gif)
 
-## Technical Details
+
+## Credits
+
+This application, same as most of this document, was created by Joshua Tzucker, in the original [joshuatz/nfc-epaper-writer] repository.
+
+Work in [DevPika/nfc-epaper-writer-update] fork added color dithering, makes the app more stable (less ANRs) and supports additional models.
+
+This fork only added [Dockerfile] recipe on top, to produce APK file easily.
+
+[joshuatz/nfc-epaper-writer]: https://github.com/joshuatz/nfc-epaper-writer
+[DevPika/nfc-epaper-writer-update]: https://github.com/DevPika/nfc-epaper-writer-update/
+
+
+## Technical Details - from original [joshuatz/nfc-epaper-writer]
+
 Building this project was my first time touching Kotlin, Java, or Android APIs, of which this project uses all three. I opted to go this route (native Android dev) instead of React Native or Flutter, because I knew I was going to need access to a lot of lower level APIs, and saw it as an opportunity to learn some new skills.
 
 This project uses a bunch of different technologies, and takes some interesting "shortcuts":
 
 - For the custom image generation options - both the text editor or WYSIWYG editor - I used WebView so that I could use HTML + JS + Web Canvas, and pass back the bitmap data to Android
-	- The WYSIWYG editor is actually just [JSPaint](https://jspaint.app/), but with injected JavaScript for capturing the bitmap data from the app's canvas
-	- The text editor is a custom tiny webpage I put together that renders the text to a Canvas element, and then captures the raw bitmap data
+  - The WYSIWYG editor is actually just [JSPaint](https://jspaint.app/), but with injected JavaScript for capturing the bitmap data from the app's canvas
+  - The text editor is a custom tiny webpage I put together that renders the text to a Canvas element, and then captures the raw bitmap data
 - The local image option uses [CanHub/Android-Image-Cropper](https://github.com/CanHub/Android-Image-Cropper) for cropping and resizing
 - By using scoped storage and the right APIs, no special permissions (other than NFC and Internet) are required from the User.
 - For actually sending the bitmap data over the NFC protocol, this uses the [WaveShare Android SDK](https://www.waveshare.com/wiki/Android_SDK_for_NFC-Powered_e-Paper), and the JAR file that they provided.
 - Kotlin coroutines are used throughout, as there are a lot of operations that are blocking in nature (the main transceive operation is basically one long blocking sequence).
 
-> If you are interested in the WaveShare module itself, I will likely have a blog post coming soon with some more details.
 
-## Where to Get It
-Currently, this is not published to the App Store. If I have time, I might work on that avenue. For now, I'm side-loading it after building it, which anyone else is free to as well.
-
-## Backlog
+## Backlog - from original [joshuatz/nfc-epaper-writer]
 
 - Mirror tag write exceptions to UI (right now just in console)
 - Look for better recovery methods for NFC adapter dying
 - When saving generated image, prefix or suffix with resolution, and then only allow cached image for re-flashing if saved resolution matches
 - App Icon
 - Publish and/or provide sideload instructions
-
-## About Me
-More About Me (Joshua Tzucker):
-
- - 🔗<a href="https://joshuatz.com/" rel="noopener" target="_blank">joshuatz.com</a>
- - 💬<a href="https://twitter.com/1joshuatz" rel="noopener" target="_blank">@1joshuatz</a>
- - 💾<a href="https://github.com/joshuatz" rel="noopener" target="_blank">github.com/joshuatz</a>
