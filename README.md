@@ -95,22 +95,31 @@ This fork only added [Dockerfile] recipe on top, to produce APK file easily.
 [DevPika/nfc-epaper-writer-update]: https://github.com/DevPika/nfc-epaper-writer-update/
 
 
-## Technical Details - from original [joshuatz/nfc-epaper-writer]
+## Notes from original [joshuatz/nfc-epaper-writer] project
+
+
+### Technical Details
 
 Building this project was my first time touching Kotlin, Java, or Android APIs, of which this project uses all three. I opted to go this route (native Android dev) instead of React Native or Flutter, because I knew I was going to need access to a lot of lower level APIs, and saw it as an opportunity to learn some new skills.
 
 This project uses a bunch of different technologies, and takes some interesting "shortcuts":
 
 - For the custom image generation options - both the text editor or WYSIWYG editor - I used WebView so that I could use HTML + JS + Web Canvas, and pass back the bitmap data to Android
-  - The WYSIWYG editor is actually just [JSPaint](https://jspaint.app/), but with injected JavaScript for capturing the bitmap data from the app's canvas
-  - The text editor is a custom tiny webpage I put together that renders the text to a Canvas element, and then captures the raw bitmap data
+
+    - The WYSIWYG editor is actually just [JSPaint](https://jspaint.app/), but with injected JavaScript for capturing the bitmap data from the app's canvas
+
+    - The text editor is a custom tiny webpage I put together that renders the text to a Canvas element, and then captures the raw bitmap data
+
 - The local image option uses [CanHub/Android-Image-Cropper](https://github.com/CanHub/Android-Image-Cropper) for cropping and resizing
+
 - By using scoped storage and the right APIs, no special permissions (other than NFC and Internet) are required from the User.
+
 - For actually sending the bitmap data over the NFC protocol, this uses the [WaveShare Android SDK](https://www.waveshare.com/wiki/Android_SDK_for_NFC-Powered_e-Paper), and the JAR file that they provided.
+
 - Kotlin coroutines are used throughout, as there are a lot of operations that are blocking in nature (the main transceive operation is basically one long blocking sequence).
 
 
-## Backlog - from original [joshuatz/nfc-epaper-writer]
+### Backlog
 
 - Mirror tag write exceptions to UI (right now just in console)
 - Look for better recovery methods for NFC adapter dying
