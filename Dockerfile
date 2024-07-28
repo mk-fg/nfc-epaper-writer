@@ -22,7 +22,7 @@ RUN file=commandlinetools-linux-11076708_latest.zip \
 	&& mkdir android && mv cmdline-tools android/tools
 RUN cd android && yes | ./tools/bin/sdkmanager --licenses --sdk_root=.
 
-RUN commit=3534fed7c74306e14588cb083bb66af7fae7749b \
+RUN commit=f75f046f9c158201bb07f02d0d9efd1f7375b20b \
 	&& curl -fsL https://github.com/mk-fg/nfc-epaper-writer/archive/"$commit".tar.gz \
 		| tar -xzf- && ln -s nfc-epaper-writer-"$commit" nfc-epaper-writer
 
