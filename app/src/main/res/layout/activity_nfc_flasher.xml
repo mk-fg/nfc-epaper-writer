@@ -53,12 +53,12 @@
         android:id="@+id/holdPhoneToPairTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/hold_phone_to_flash_text"
         android:textSize="20sp"
-        android:layout_marginTop="180dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/previewImageWrapper"
-        android:text="@string/hold_phone_to_flash_text" />
+        app:layout_constraintTop_toBottomOf="@id/previewImageWrapper" />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

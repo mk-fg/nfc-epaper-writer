@@ -60,7 +60,7 @@
                 android:id="@+id/cta_pick_image_file"
                 android:layout_width="241dp"
                 android:layout_height="65dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="20dp"
                 android:text="@string/pick_image_file_cta_text" />
 
             <Button

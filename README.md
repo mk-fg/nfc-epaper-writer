@@ -89,7 +89,7 @@ This application, same as most of this document, was created by Joshua Tzucker, 
 
 Work in [DevPika/nfc-epaper-writer-update] fork added color dithering, makes the app more stable (less ANRs) and supports additional models.
 
-This fork only added [Dockerfile] recipe on top, to produce APK file easily.
+This fork only added [Dockerfile] recipe on top to produce APK file easily, and has tweaked UI elements for smaller screens.
 
 [joshuatz/nfc-epaper-writer]: https://github.com/joshuatz/nfc-epaper-writer
 [DevPika/nfc-epaper-writer-update]: https://github.com/DevPika/nfc-epaper-writer-update/
