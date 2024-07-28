@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,8 +16,13 @@ import androidx.cardview.widget.CardView
 import com.askjeffreyliu.floydsteinbergdithering.Utils
 import com.canhub.cropper.CropImage
 import com.canhub.cropper.CropImageView
+import com.vansuita.pickimage.bean.PickResult
+import com.vansuita.pickimage.bundle.PickSetup
+import com.vansuita.pickimage.dialog.PickImageDialog
+import com.vansuita.pickimage.listeners.IPickResult
+import com.vansuita.pickimage.enums.EPickType
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), IPickResult {
     private var mPreferencesController: Preferences? = null
     private var mHasReFlashableImage: Boolean = false
     private val mReFlashButton: CardView get() = findViewById(R.id.reflashButton)
@@ -58,11 +62,22 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        // Setup image file picker
-        val imageFilePickerCTA: Button = findViewById(R.id.cta_pick_image_file)
-        imageFilePickerCTA.setOnClickListener {
+        // Setup exact-size image file picker
+        val imageFilePickerExactCTA: Button = findViewById(R.id.cta_image_exact)
+        imageFilePickerExactCTA.setOnClickListener {
             val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
+            val setup = PickSetup()
+                .setTitle("Select ${screenSizePixels.first} x ${screenSizePixels.second} image")
+                .setMaxSize(1000)
+                .setPickTypes(EPickType.GALLERY)
+                .setSystemDialog(true)
+            PickImageDialog.build(setup).show(this)
+        }
 
+        // Setup image file/photo picker with crop/processing
+        val imageFilePickerProcCTA: Button = findViewById(R.id.cta_image_proc)
+        imageFilePickerProcCTA.setOnClickListener {
+            val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
             CropImage
                 .activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
@@ -86,13 +101,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Set image uri if launched from another app
-        mSharedImageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+        mSharedImageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         // Set image uri if launched from another app
-        mSharedImageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+        mSharedImageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM)
     }
 
     override fun onResume() {
@@ -115,27 +130,57 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
 
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(resultData)
-            if (resultCode == Activity.RESULT_OK) {
-                var croppedBitmap = result?.getBitmap(this)
-                if (croppedBitmap != null) {
-                    croppedBitmap = Utils().floydSteinbergDitheringBWR(croppedBitmap)
-                    // Resizing should have already been taken care of by setRequestedSize
-                    // Save
-                    openFileOutput(GeneratedImageFilename, Context.MODE_PRIVATE).use { fileOutStream ->
-                        croppedBitmap?.compress(Bitmap.CompressFormat.PNG, 100, fileOutStream)
-                        fileOutStream.close()
-                        // Navigate to flasher
-                        val navIntent = Intent(this, NfcFlasher::class.java)
-                        startActivity(navIntent)
-                    }
-                } else {
-                    Log.e("Crop image callback", "Crop image result not available")
-                }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result!!.error
-            }
+        if (requestCode != CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) return
+
+        val result = CropImage.getActivityResult(resultData)
+        var error: String? = null
+        var bitmap: Bitmap? = null
+        if (resultCode == Activity.RESULT_OK) {
+            bitmap = result?.getBitmap(this)
+            if (bitmap != null) bitmap = Utils().floydSteinbergDitheringBWR(bitmap)
+            if (bitmap == null) error = "result not available"
+        } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+            error = result!!.error.toString()
+        } else return
+        if (error != null) {
+            Toast.makeText(this, "Crop image failure: $error", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        // Save
+        // Resizing should have already been taken care of by setRequestedSize
+        openFileOutput(GeneratedImageFilename, Context.MODE_PRIVATE).use { fileOutStream ->
+            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, fileOutStream)
+            fileOutStream.close()
+            // Navigate to flasher
+            val navIntent = Intent(this, NfcFlasher::class.java)
+            startActivity(navIntent)
+        }
+    }
+
+    override fun onPickResult(result: PickResult) {
+        if (result.error != null) {
+            Toast.makeText(this, result.error.toString(), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
+        val bitmap = result.bitmap
+        val w = bitmap.width
+        val h = bitmap.height
+        if (w != screenSizePixels.first || h != screenSizePixels.second) {
+            Toast.makeText(this, "Image size ($w x $h) does not match screen size exactly"
+              + " (${screenSizePixels.first} x ${screenSizePixels.second})", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        // Save
+        openFileOutput(GeneratedImageFilename, Context.MODE_PRIVATE).use { fileOutStream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutStream)
+            fileOutStream.close()
+            // Navigate to flasher
+            val navIntent = Intent(this, NfcFlasher::class.java)
+            startActivity(navIntent)
         }
     }
 

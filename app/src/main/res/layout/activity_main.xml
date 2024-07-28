@@ -57,22 +57,29 @@
             </androidx.cardview.widget.CardView>
 
             <Button
-                android:id="@+id/cta_pick_image_file"
-                android:layout_width="241dp"
+                android:id="@+id/cta_image_exact"
+                android:layout_width="300dp"
                 android:layout_height="65dp"
                 android:layout_marginTop="20dp"
-                android:text="@string/pick_image_file_cta_text" />
+                android:text="@string/cta_image_exact_text" />
+
+            <Button
+                android:id="@+id/cta_image_proc"
+                android:layout_width="300dp"
+                android:layout_height="65dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/cta_image_proc_text" />
 
             <Button
                 android:id="@+id/cta_new_text"
-                android:layout_width="241dp"
+                android:layout_width="300dp"
                 android:layout_height="65dp"
                 android:layout_marginTop="15dp"
                 android:text="@string/cta_new_text_invite" />
 
             <Button
                 android:id="@+id/cta_new_graphic"
-                android:layout_width="241dp"
+                android:layout_width="300dp"
                 android:layout_height="65dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="20dp"
