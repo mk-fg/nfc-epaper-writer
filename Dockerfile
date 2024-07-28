@@ -1,6 +1,6 @@
-## Dockerfile to build apk, fetching all decessary dependencies for that along the way
+## Dockerfile to build apk, fetching all necessary dependencies for that along the way
 ## Build/copy app-debug.apk to current dir with: docker build --output type=local,dest=. .
-## For older docker where build != buildx, run: docker buildx build --output type=local,dest=. .
+## For older docker where build != buildx, install/run: docker buildx build --output type=local,dest=. .
 
 FROM debian:stable-20240722-slim AS build
 

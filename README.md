@@ -43,6 +43,10 @@ This requires any system with modern docker (aka [Docker Engine]) installed, and
 
     This will use [Dockerfile] as a recipe for `app-debug.apk` and put it next to that Dockerfile.
 
+    An older docker setup might give "unknown --output option" error,
+    in which case [docker-buildx plugin] might be required, and command will be
+    `docker buildx build --output type=local,dest=. .` instead of the one above.
+
 -   Copy generated `app-debug.apk` file to an Android device, and open it there (e.g. find and tap on it in Files app).
 
 -   Follow Android OS instruction popups from there on how to enable necessary settings to be able to install this tool from a sideloaded APK file.
@@ -53,6 +57,7 @@ This requires any system with modern docker (aka [Docker Engine]) installed, and
 
 [Docker Engine]: https://docs.docker.com/engine/install/
 [Dockerfile]: Dockerfile
+[docker-buildx plugin]: https://www.baeldung.com/ops/docker-buildx
 
 
 ## Demos
@@ -89,7 +94,7 @@ This application, same as most of this document, was created by Joshua Tzucker, 
 
 Work in [DevPika/nfc-epaper-writer-update] fork added color dithering, makes the app more stable (less ANRs) and supports additional models.
 
-This fork only added [Dockerfile] recipe on top to produce APK file easily, and has tweaked UI elements for smaller screens.
+This fork added [Dockerfile] recipe on top to build APK file easily, "Load Exact Image" button, and has tweaked UI elements for smaller screens.
 
 [joshuatz/nfc-epaper-writer]: https://github.com/joshuatz/nfc-epaper-writer
 [DevPika/nfc-epaper-writer-update]: https://github.com/DevPika/nfc-epaper-writer-update/
