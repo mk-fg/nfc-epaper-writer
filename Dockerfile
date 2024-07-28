@@ -9,7 +9,7 @@ WORKDIR /build
 RUN echo >apt '#!/bin/sh' && chmod +x apt && echo >>apt \
 	'export DEBIAN_FRONTEND=noninteractive; exec apt-get </dev/null' \
 	'-o=Dpkg::Options::=--force-confold -o=Dpkg::Options::=--force-confdef' \
-	' --assume-yes --quiet --no-install-recommends "$@"'
+	'--assume-yes --quiet --no-install-recommends "$@"'
 RUN ./apt update
 RUN ./apt install openjdk-17-jre-headless
 RUN ./apt install curl unzip git

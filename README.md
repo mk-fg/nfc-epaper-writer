@@ -41,7 +41,7 @@ This requires any system with modern docker (aka [Docker Engine]) installed, and
     % docker build --output type=local,dest=. .
     ```
 
-    This will use [Dockerfile] as a recipe to build `app-debug.apk` file and copy it to the current directory (next to that Dockerfile).
+    This will use [Dockerfile] as a recipe for `app-debug.apk` and put it next to that Dockerfile.
 
 -   Copy generated `app-debug.apk` file to an Android device, and open it there (e.g. find and tap on it in Files app).
 
