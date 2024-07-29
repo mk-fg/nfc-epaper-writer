@@ -22,11 +22,14 @@ RUN file=commandlinetools-linux-11076708_latest.zip \
 	&& mkdir android && mv cmdline-tools android/tools
 RUN cd android && yes | ./tools/bin/sdkmanager --licenses --sdk_root=.
 
-RUN commit=f75f046f9c158201bb07f02d0d9efd1f7375b20b \
-	&& curl -fsL https://github.com/mk-fg/nfc-epaper-writer/archive/"$commit".tar.gz \
-		| tar -xzf- && ln -s nfc-epaper-writer-"$commit" nfc-epaper-writer
-
-RUN cd nfc-epaper-writer && ANDROID_HOME=/build/android bash gradlew build
+# gradle build will download a lot, which won't be reusable for other commits anyway
+# So don't bother caching any of this in the build here
+RUN commit=349582e832aa0cd5d386796d8119670baa21605f \
+	&& curl -fsL https://github.com/mk-fg/nfc-epaper-writer/archive/"$commit".tar.gz | tar -xzf- \
+	&& cd nfc-epaper-writer-"$commit" \
+	&& ANDROID_HOME=/build/android bash gradlew build \
+	&& cp app/build/outputs/apk/debug/app-debug.apk / \
+	&& rm -rf /build
 
 FROM scratch AS artifact
-COPY --from=build /build/nfc-epaper-writer/app/build/outputs/apk/debug/app-debug.apk /
+COPY --from=build /app-debug.apk /
