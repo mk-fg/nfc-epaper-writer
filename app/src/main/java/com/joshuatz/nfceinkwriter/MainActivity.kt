@@ -36,14 +36,14 @@ class MainActivity : AppCompatActivity(), IPickResult {
         setSupportActionBar(findViewById(R.id.main_toolbar))
 
         // Get user preferences
-        this.mPreferencesController = Preferences(this)
-        this.updateScreenSizeDisplay(null)
+        mPreferencesController = Preferences(this)
+        updateScreenSizeDisplay(null)
 
         // Setup screen size changer
         val screenSizeChangeInvite: Button = findViewById(R.id.changeDisplaySizeInvite)
         screenSizeChangeInvite.setOnClickListener {
-            this.mPreferencesController?.showScreenSizePicker(fun(updated: String): Void? {
-                this.updateScreenSizeDisplay(updated)
+            mPreferencesController!!.showScreenSizePicker(fun(updated: String): Void? {
+                updateScreenSizeDisplay(updated)
                 return null
             })
         }
@@ -65,9 +65,9 @@ class MainActivity : AppCompatActivity(), IPickResult {
         // Setup exact-size image file picker
         val imageFilePickerExactCTA: Button = findViewById(R.id.cta_image_exact)
         imageFilePickerExactCTA.setOnClickListener {
-            val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
+            val (sw, sh) = mPreferencesController!!.getScreenSizePixels()
             val setup = PickSetup()
-                .setTitle("Select ${screenSizePixels.first} x ${screenSizePixels.second} image")
+                .setTitle("Select $sw x $sh image")
                 .setMaxSize(1000) // downscales large images to avoid wasting mem on them
                 .setPickTypes(EPickType.GALLERY)
                 .setSystemDialog(true)
@@ -77,12 +77,12 @@ class MainActivity : AppCompatActivity(), IPickResult {
         // Setup image file/photo picker with crop/processing
         val imageFilePickerProcCTA: Button = findViewById(R.id.cta_image_proc)
         imageFilePickerProcCTA.setOnClickListener {
-            val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
+            val (sw, sh) = mPreferencesController!!.getScreenSizePixels()
             CropImage
                 .activity()
                 .setGuidelines(CropImageView.Guidelines.ON)
-                .setAspectRatio(screenSizePixels.first, screenSizePixels.second)
-                .setRequestedSize(screenSizePixels.first, screenSizePixels.second, CropImageView.RequestSizeOptions.RESIZE_EXACT)
+                .setAspectRatio(sw, sh)
+                .setRequestedSize(sw, sh, CropImageView.RequestSizeOptions.RESIZE_EXACT)
                 .start(this)
         }
 
@@ -114,14 +114,14 @@ class MainActivity : AppCompatActivity(), IPickResult {
         super.onResume()
         checkReFlashAbility()
         if (mSharedImageUri == null) return
-        val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
+        val (sw, sh) = mPreferencesController!!.getScreenSizePixels()
         val uri = mSharedImageUri
         mSharedImageUri = null
         CropImage
             .activity(uri)
             .setGuidelines(CropImageView.Guidelines.ON)
-            .setAspectRatio(screenSizePixels.first, screenSizePixels.second)
-            .setRequestedSize(screenSizePixels.first, screenSizePixels.second, CropImageView.RequestSizeOptions.RESIZE_EXACT)
+            .setAspectRatio(sw, sh)
+            .setRequestedSize(sw, sh, CropImageView.RequestSizeOptions.RESIZE_EXACT)
             .start(this)
     }
 
@@ -150,13 +150,12 @@ class MainActivity : AppCompatActivity(), IPickResult {
             Toast.makeText(this, result.error.toString(), Toast.LENGTH_LONG).show()
             return
         }
-        val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
         val bitmap = result.bitmap
-        val w = bitmap.width
-        val h = bitmap.height
-        if (w != screenSizePixels.first || h != screenSizePixels.second) {
-            Toast.makeText(this, "Image size ($w x $h) does not match screen size exactly"
-              + " (${screenSizePixels.first} x ${screenSizePixels.second})", Toast.LENGTH_LONG).show()
+        val (sw, sh) = mPreferencesController!!.getScreenSizePixels()
+        val (iw, ih) = bitmap.width to bitmap.height
+        if (iw != sw || ih != sh) {
+            Toast.makeText(this, "Image size ($iw x $ih) does not match"
+              + " screen size exactly ($sw x $sh)", Toast.LENGTH_LONG).show()
             return
         }
         flashBitmap(bitmap!!)
@@ -174,8 +173,8 @@ class MainActivity : AppCompatActivity(), IPickResult {
     private fun updateScreenSizeDisplay(updated: String?) {
         var screenSizeStr = updated
         if (screenSizeStr == null) {
-            screenSizeStr = this.mPreferencesController?.getPreferences()
-                ?.getString(Constants.PreferenceKeys.DisplaySize, DefaultScreenSize)
+            screenSizeStr = mPreferencesController!!.getPreferences()
+                .getString(Constants.PreferenceKeys.DisplaySize, DefaultScreenSize)
         }
         findViewById<TextView>(R.id.currentDisplaySize).text = screenSizeStr ?: DefaultScreenSize
     }
