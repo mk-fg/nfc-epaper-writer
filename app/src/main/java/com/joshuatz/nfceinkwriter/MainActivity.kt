@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), IPickResult {
             val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
             val setup = PickSetup()
                 .setTitle("Select ${screenSizePixels.first} x ${screenSizePixels.second} image")
-                .setMaxSize(1000)
+                .setMaxSize(1000) // downscales large images to avoid wasting mem on them
                 .setPickTypes(EPickType.GALLERY)
                 .setSystemDialog(true)
             PickImageDialog.build(setup).show(this)
@@ -113,9 +113,7 @@ class MainActivity : AppCompatActivity(), IPickResult {
     override fun onResume() {
         super.onResume()
         checkReFlashAbility()
-
         if (mSharedImageUri == null) return
-
         val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
         val uri = mSharedImageUri
         mSharedImageUri = null
@@ -129,9 +127,7 @@ class MainActivity : AppCompatActivity(), IPickResult {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
-
         if (requestCode != CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) return
-
         val result = CropImage.getActivityResult(resultData)
         var error: String? = null
         var bitmap: Bitmap? = null
@@ -146,16 +142,7 @@ class MainActivity : AppCompatActivity(), IPickResult {
             Toast.makeText(this, "Crop image failure: $error", Toast.LENGTH_LONG).show()
             return
         }
-
-        // Save
-        // Resizing should have already been taken care of by setRequestedSize
-        openFileOutput(GeneratedImageFilename, Context.MODE_PRIVATE).use { fileOutStream ->
-            bitmap!!.compress(Bitmap.CompressFormat.PNG, 100, fileOutStream)
-            fileOutStream.close()
-            // Navigate to flasher
-            val navIntent = Intent(this, NfcFlasher::class.java)
-            startActivity(navIntent)
-        }
+        flashBitmap(bitmap!!)
     }
 
     override fun onPickResult(result: PickResult) {
@@ -163,7 +150,6 @@ class MainActivity : AppCompatActivity(), IPickResult {
             Toast.makeText(this, result.error.toString(), Toast.LENGTH_LONG).show()
             return
         }
-
         val screenSizePixels = this.mPreferencesController?.getScreenSizePixels()!!
         val bitmap = result.bitmap
         val w = bitmap.width
@@ -173,12 +159,13 @@ class MainActivity : AppCompatActivity(), IPickResult {
               + " (${screenSizePixels.first} x ${screenSizePixels.second})", Toast.LENGTH_LONG).show()
             return
         }
+        flashBitmap(bitmap!!)
+    }
 
-        // Save
+    private fun flashBitmap(bitmap: Bitmap) {
         openFileOutput(GeneratedImageFilename, Context.MODE_PRIVATE).use { fileOutStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutStream)
             fileOutStream.close()
-            // Navigate to flasher
             val navIntent = Intent(this, NfcFlasher::class.java)
             startActivity(navIntent)
         }
