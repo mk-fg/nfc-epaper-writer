@@ -99,27 +99,29 @@ App should work with all screen sizes supported by [WaveShare SDK].
 ## How to build and install this to an Android device
 
 Steps below require any system with modern docker (aka [Docker Engine]) installed
-(e.g. `apt install docker` on ubuntu/debian linux), and any terminal console app
-available to also run its command-line tools from.
+(via e.g. `apt install docker` on ubuntu/debian linux), any terminal console app
+available to also run its command-line tools from, ~5 GiB of peak memory and
+about 3 GiB of disk space temporarily.
 
--   `git clone ...` or otherwise download/unpack repository contents to a
-    directory, and run subsequent steps in there.
+-   Copy or download [Dockerfile] from this repository into any directory.
 
-    For example, on a typical linux system with command-line git tool available:
+    Doesn't really matter which dir, it'll only be used to copy build result
+    (apk file) into by "docker build" command below.
 
-    ``` console
-    % git clone --depth=1 https://github.com/mk-fg/nfc-epaper-writer/
-    % cd nfc-epaper-writer
+    For example, to fetch it using curl from the command line:
+
+    ```
+    curl -OL https://raw.githubusercontent.com/mk-fg/nfc-epaper-writer/main/Dockerfile
     ```
 
 -   Build and copy Android application package (APK) to the current directory:
 
-    ``` console
-    % docker build --output type=local,dest=. .
+    ```
+    docker build --output type=local,dest=. .
     ```
 
-    This will use [Dockerfile] as a recipe for `app-debug.apk` and put it next
-    to that Dockerfile.
+    This will use Dockerfile as a recipe for `app-debug.apk`
+    and will put it next to that Dockerfile afterwards.
 
     An older docker setup might give "unknown --output option" error,
     in which case [docker-buildx plugin] might be required, and command will be
@@ -133,19 +135,20 @@ available to also run its command-line tools from.
 
     This type of app installation from an APK file is called "sideloading", and
     steps required to allow it change between Android versions, but should be
-    easy to lookup for specific one on the internet.
+    easy to lookup for specific one on the internet, if Android's built-in prompts
+    don't make it clear enough.
 
 -   Installed tool should show up among the usual "application drawer" icons
-    with "NFC E-Ink Writer" name and a basic "android robot head" icon.
+    with "NFC E-Ink Writer" name and a generic "android robot head" icon.
 
 Another, more developer-focused option, is to build APK using [Android Studio IDE],
 which might be more or less complicated, depending on one's experience working
 with such tools/ecosystem (vs command-line steps above) - open the project there,
 and pick APK option from the Build menu.
 
+[Dockerfile]: Dockerfile
 [Android Studio IDE]: https://developer.android.com/studio
 [Docker Engine]: https://docs.docker.com/engine/install/
-[Dockerfile]: Dockerfile
 [docker-buildx plugin]: https://www.baeldung.com/ops/docker-buildx
 
 
