@@ -9,7 +9,7 @@ Contents:
 - [How to build and install this to an Android device]
 - [Demos](#hdr-demos)
 - [Known Issues](#hdr-known_issues)
-- [Backlog](#hdr-backlog)
+- [Task Backlog](#hdr-task_backlog)
 - [Technical Details from the original project]
 
 It's only intended to interact with WaveShare displays through [their Android SDK],
@@ -129,6 +129,7 @@ about 3 GiB of disk space temporarily.
 
 -   Copy generated `app-debug.apk` file to an Android device, and open it there
     (e.g. find and tap on it in Files app).
+    Note that Android 11+ is required for this app, shouldn't work on older devices.
 
 -   Follow Android OS instruction popups from there on how to enable necessary
     settings to be able to install this tool from a sideloaded APK file.
@@ -158,17 +159,17 @@ and pick APK option from the Build menu.
 These showcase application version from the original repository and displays
 packaged separately from the control board.
 
-- Flashing a local image file:
+- Updating from a local image file:
 
-    ![Animated GIF showing this application letting a user select a local image file from their gallery, cropping it, and then flashing it to the EInk NFC display](https://user-images.githubusercontent.com/17817563/118732297-e2329f80-b7ee-11eb-9f5c-16b2872d6bf6.gif)
+    ![Animated GIF showing this application letting a user select a local image file from their gallery, cropping it, and then updating EInk NFC display](https://user-images.githubusercontent.com/17817563/118732297-e2329f80-b7ee-11eb-9f5c-16b2872d6bf6.gif)
 
-- Flashing Text:
+- Updating from typed-in text:
 
-    ![Animated GIF showing the user being able to input custom text, having the text captured as an image, and then flashing the resulting image to the EInk NFC Display](https://user-images.githubusercontent.com/17817563/118735056-7eab7080-b7f4-11eb-9d11-60d2aa58efe4.gif)
+    ![Animated GIF showing the user being able to input custom text, having the text captured as an image, and then updating EInk NFC Display with resulting image](https://user-images.githubusercontent.com/17817563/118735056-7eab7080-b7f4-11eb-9d11-60d2aa58efe4.gif)
 
-- Creating and flashing with a WYSIWYG editor:
+- WYSIWYG image creator:
 
-    ![Animated GIF showing user creating a custom image via WYSIWYG paint editor, having the image captured to bitmap, and then flashing the generated bitmap to the EInk NFC Display](https://user-images.githubusercontent.com/17817563/118734322-ff696d00-b7f2-11eb-947d-dc844c259518.gif)
+    ![Animated GIF showing user creating a custom image via WYSIWYG paint editor, having the image captured to bitmap, and then uploading generated bitmap to EInk NFC Display](https://user-images.githubusercontent.com/17817563/118734322-ff696d00-b7f2-11eb-947d-dc844c259518.gif)
 
 
 <a name=hdr-known_issues></a>
@@ -177,7 +178,7 @@ packaged separately from the control board.
 NFC can be a little finnicky, and especially with these EInk displays.
 Depending on the power and capabilities of your phone, it may take time
 perfecting the exact distance and position to hold your phone in proximity
-to the EInk display in order to get successful flashes.
+to the EInk display in order to get successful updates.
 
 On certain Android phones, you might also see a high rate of your NFC radio /
 chipset randomly *"dying"*.
@@ -192,14 +193,24 @@ application to detect or attempt to recover from.
 Additionally, sometimes you might see corrupted writes, where something goes
 wrong during the transceiving process and the display ends up with random noise:
 
-![Animated GIF showing a failed flash, with random noise appearing over the previously flashed image](https://user-images.githubusercontent.com/17817563/118723223-fde37900-b7e1-11eb-8b0c-c12ba4387d27.gif)
+![Animated GIF showing a failed update, with random noise appearing over previous image](https://user-images.githubusercontent.com/17817563/118723223-fde37900-b7e1-11eb-8b0c-c12ba4387d27.gif)
+
+Disabling-enabling NFC on the phone (by tapping its Quick Settings tile at the top)
+and re-sending the image afterwards works for me to work around the issue.
+NFC reset is needed because usually it stops working when this happens (like due
+to problem being "NFC dying" mentioned above), sometimes crashing/restarting the
+app as well.
 
 [internal recovery efforts here]:
   https://github.com/aosp-mirror/platform_frameworks_base/blob/9635abafa0053c65e04b93da16c72da8af371454/core/java/android/nfc/NfcAdapter.java#L831-L865
 
 
-<a name=hdr-backlog></a>
-## Backlog
+<a name=hdr-task_backlog></a>
+## Task Backlog
+
+- Replace "flashing" wording from original app with "update" or "upload",
+  as don't think it's called that in WaveShare docs, and memory is only
+  used as a temp buffer here, so seem to be a wrong/misleading word to use.
 
 - Better recovery methods for NFC adapter dying.
 
